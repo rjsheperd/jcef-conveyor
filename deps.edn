@@ -1,0 +1,2 @@
+{:paths ["src/clj"]
+ :deps  {me.friwi/jcefmaven {:mvn/version "110.0.25"}}}
