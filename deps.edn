@@ -1,2 +1,9 @@
-{:paths ["src/clj"]
- :deps  {me.friwi/jcefmaven {:mvn/version "110.0.25"}}}
+{:paths    ["src/clj"]
+ :deps     {me.friwi/jcefmaven {:mvn/version "110.0.25"}}
+ :aliases  {:dev 
+            {:jvm-opts ["--add-exports=java.base/java.lang=ALL-UNNAMED"
+                        "--add-exports=java.desktop/sun.awt=ALL-UNNAMED"
+                        "--add-exports=java.desktop/sun.java2d=ALL-UNNAMED"
+                        "--add-opens=java.desktop/sun.awt=ALL-UNNAMED"
+                        "--add-opens=java.desktop/sun.lwawt=ALL-UNNAMED"
+                        "--add-opens=java.desktop/sun.lwawt.macosx=ALL-UNNAMED"]}}}

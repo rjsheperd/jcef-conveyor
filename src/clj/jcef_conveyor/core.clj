@@ -8,13 +8,14 @@
            [java.awt.event ActionListener WindowAdapter]
            [javax.swing JFrame JTextField]))
 
-(defn create-sample-frame [start-url use-osr is-transparent]
-  (let [builder (jcef-builder)
-        _       (set! (.. builder -cefSettings -windowless_rendering_enabled) use-osr)
-        _       (.setAppHandler (proxy [MavenCefAppHandlerAdapter] []
-                            (stateHasChanged [state]
-                              (when (= state CefApp$CefAppState/TERMINATED)
-                                (System/exit 0)))))
+(defn create-sample-frame [title start-url use-osr is-transparent]
+  (let [builder       (jcef-builder)
+        _             (set! (.-windowless_rendering_enabled (.getCefSettings builder)) use-osr)
+        _             (.setAppHandler builder
+                                      (proxy [MavenCefAppHandlerAdapter] []
+                                        (stateHasChanged [state]
+                                          (when (= state CefApp$CefAppState/TERMINATED)
+                                            (System/exit 0)))))
         cef-app       (.build builder)
         client        (.createClient cef-app)
         msg-router    (CefMessageRouter/create)
@@ -25,12 +26,13 @@
                         (.addActionListener (proxy [ActionListener] []
                                               (actionPerformed [_]
                                                 (.loadURL browser start-url)))))
-        browser-focus (atom true)]
-    
+        browser-focus (atom true)
+        jframe        (JFrame. title)]
+
     (.addDisplayHandler client (proxy [CefDisplayHandlerAdapter] []
                                  (onAddressChange [_ _ url]
                                    (.setText address url))))
-    
+
     (.addFocusHandler client (proxy [CefFocusHandlerAdapter] []
                                (onGotFocus [_]
                                  (when-not @browser-focus
@@ -40,10 +42,11 @@
                                (onTakeFocus [_ _]
                                  (reset! browser-focus false))))
     
-    (doto (JFrame. "Sample")
-      (.getContentPane)
+    (doto (.getContentPane jframe)
       (.add address BorderLayout/NORTH)
-      (.add browser-ui BorderLayout/CENTER)
+      (.add browser-ui BorderLayout/CENTER))
+
+    (doto jframe
       (.pack)
       (.setSize 1024 768)
       (.setVisible true)
@@ -52,16 +55,17 @@
                               (.dispose (CefApp/getInstance))))))))
 
 (defn -main [& args]
-  (create-sample-frame "https://www.google.com" false false)
+  (create-sample-frame "https://www.google.com" "Example App" false false))
 
-  (def my-frame (JFrame. "Sample"))
+(comment
+  (def my-frame (JFrame. "Example App"))
   (def content-pane (.getContentPane my-frame))
-  (.pack my-frame)
-  (.setSize my-frame 1024 768)
-  (.pack my-frame)
-  (.setVisible my-frame true)
-  (.. my-frame
-    
-    (.add ))
+  (doto content-pane
+    (.add (JTextField "example")))
+
+  (doto my-frame
+    (.pack)
+    (.setSize 1024 768)
+    (.setVisible true))
 
   )
